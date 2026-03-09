@@ -12,8 +12,8 @@ function SearchContent() {
   const router = useRouter();
   const initialQuery = searchParams.get('q') || '';
 
-  const [query, setQuery] = useState(initialQuery);
   const [inputValue, setInputValue] = useState(initialQuery);
+  const [query, setQuery] = useState(initialQuery);
   const [pathwayFilter, setPathwayFilter] = useState('');
   const [sortMode, setSortMode] = useState<'relevance' | 'alpha'>('relevance');
   const [results, setResults] = useState(searchCareers(initialQuery, careers));
@@ -25,6 +25,17 @@ function SearchContent() {
     setResults(found);
   }, [pathwayFilter, sortMode]);
 
+  // Debounce: update query 300ms after user stops typing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setQuery(inputValue);
+      if (inputValue.trim()) {
+        router.push(`/search?q=${encodeURIComponent(inputValue.trim())}`, { scroll: false });
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [inputValue, router]);
+
   useEffect(() => {
     runSearch(query);
   }, [query, pathwayFilter, sortMode, runSearch]);
@@ -32,7 +43,7 @@ function SearchContent() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setQuery(inputValue);
-    router.push(`/search?q=${encodeURIComponent(inputValue.trim())}`, { scroll: false });
+    if (inputValue.trim()) router.push(`/search?q=${encodeURIComponent(inputValue.trim())}`, { scroll: false });
   }
 
   function clearQuery() {

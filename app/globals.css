@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-kenya-green: #006600;
   --color-kenya-green-light: #008000;
@@ -16,11 +18,9 @@
   --foreground: #0F172A;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0F172A;
-    --foreground: #f1f5f9;
-  }
+.dark {
+  --background: #0F172A;
+  --foreground: #f1f5f9;
 }
 
 body {
@@ -41,11 +41,9 @@ body {
 .subject-tag-b { background-color: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
 .subject-tag-c { background-color: #ede9fe; color: #5b21b6; border: 1px solid #c4b5fd; }
 
-@media (prefers-color-scheme: dark) {
-  .subject-tag-a { background-color: #14532d; color: #86efac; border-color: #166534; }
-  .subject-tag-b { background-color: #7f1d1d; color: #fca5a5; border-color: #991b1b; }
-  .subject-tag-c { background-color: #4c1d95; color: #c4b5fd; border-color: #5b21b6; }
-}
+.dark .subject-tag-a { background-color: #14532d; color: #86efac; border-color: #166534; }
+.dark .subject-tag-b { background-color: #7f1d1d; color: #fca5a5; border-color: #991b1b; }
+.dark .subject-tag-c { background-color: #4c1d95; color: #c4b5fd; border-color: #5b21b6; }
 
 .card-hover {
   transition: transform 0.2s ease, box-shadow 0.2s ease;

@@ -1,7 +1,8 @@
 import Link from 'next/link';
-import { FlaskConical, Palette, Globe, Briefcase, Users, Info } from 'lucide-react';
+import { FlaskConical, Palette, Globe, Briefcase, Info } from 'lucide-react';
 
 export default function Footer() {
+  const year = new Date().getFullYear();
   return (
     <footer className="bg-slate-900 text-slate-300 mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -28,11 +29,17 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2">
               <li><Link href="/pathway/A" className="text-slate-400 hover:text-white text-sm transition-colors">Pathway A — STEM</Link></li>
-              <li><Link href="/pathway/B" className="text-slate-400 hover:text-white text-sm transition-colors">Pathway B — Arts & Sports</Link></li>
+              <li><Link href="/pathway/B" className="text-slate-400 hover:text-white text-sm transition-colors">Pathway B — Arts & Sports Science</Link></li>
               <li><Link href="/pathway/C" className="text-slate-400 hover:text-white text-sm transition-colors">Pathway C — Social Sciences</Link></li>
-              <li><Link href="/pathway/A/A1" className="text-slate-400 hover:text-white text-sm transition-colors">Pure & Applied Sciences</Link></li>
-              <li><Link href="/pathway/A/A2" className="text-slate-400 hover:text-white text-sm transition-colors">Engineering & Technology</Link></li>
-              <li><Link href="/pathway/B/B1" className="text-slate-400 hover:text-white text-sm transition-colors">Performing & Creative Arts</Link></li>
+              <li><Link href="/pathway/A/A1" className="text-slate-400 hover:text-white text-sm transition-colors">A1 — Pure & Applied Sciences</Link></li>
+              <li><Link href="/pathway/A/A2" className="text-slate-400 hover:text-white text-sm transition-colors">A2 — Engineering & Technology</Link></li>
+              <li><Link href="/pathway/A/A3" className="text-slate-400 hover:text-white text-sm transition-colors">A3 — Technical & Vocational</Link></li>
+              <li><Link href="/pathway/B/B1" className="text-slate-400 hover:text-white text-sm transition-colors">B1 — Performing & Creative Arts</Link></li>
+              <li><Link href="/pathway/B/B2" className="text-slate-400 hover:text-white text-sm transition-colors">B2 — Languages & Communication</Link></li>
+              <li><Link href="/pathway/B/B3" className="text-slate-400 hover:text-white text-sm transition-colors">B3 — Sports Science</Link></li>
+              <li><Link href="/pathway/C/C1" className="text-slate-400 hover:text-white text-sm transition-colors">C1 — Humanities, Law & Governance</Link></li>
+              <li><Link href="/pathway/C/C2" className="text-slate-400 hover:text-white text-sm transition-colors">C2 — Business & Entrepreneurship</Link></li>
+              <li><Link href="/pathway/C/C3" className="text-slate-400 hover:text-white text-sm transition-colors">C3 — Agriculture & Environment</Link></li>
             </ul>
           </div>
 
@@ -82,7 +89,7 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="border-t border-slate-800 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-slate-500">
-          <p>© 2025 TAFUTA CAREER. All rights reserved.</p>
+          <p>© {year} TAFUTA CAREER. All rights reserved.</p>
           <p className="text-center sm:text-right">
             This is a career guidance tool. Data based on Kenya&apos;s CBC curriculum.
           </p>

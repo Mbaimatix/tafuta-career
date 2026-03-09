@@ -13,7 +13,7 @@ export function matchCareers(
   selectedSubjects: string[],
   careersToSearch: Career[],
   pathwayFilter?: string,
-  minPercentage: number = 50
+  minPercentage: number = 25
 ): MatchResult[] {
   if (selectedSubjects.length === 0) return [];
 
@@ -33,11 +33,12 @@ export function matchCareers(
 
     const matchCount = matched.length;
     const totalRequired = career.subjects.length;
-    const matchPercentage = totalRequired > 0
-      ? Math.round((matchCount / totalRequired) * 100)
+    // Percentage based on how many of the student's selected subjects are covered by this career
+    const matchPercentage = selectedSubjects.length > 0
+      ? Math.round((matchCount / selectedSubjects.length) * 100)
       : 0;
 
-    if (matchPercentage >= minPercentage) {
+    if (matchCount > 0 && matchPercentage >= minPercentage) {
       results.push({
         career,
         matchCount,
