@@ -122,7 +122,7 @@ export function CareerCard({
               </span>
             </div>
             {career.requiresUniversity && (
-              <span title="Requires University">
+              <span title="Requires University" aria-label="Requires University">
                 <GraduationCap className="w-4 h-4 text-slate-400" />
               </span>
             )}

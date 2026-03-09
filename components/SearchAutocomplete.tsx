@@ -22,6 +22,7 @@ export default function SearchAutocomplete({ placeholder = 'Search 1,252 careers
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const fuseRef = useRef<ReturnType<typeof createSearchIndex> | null>(null);
 
   const doSearch = useCallback((q: string) => {
     if (!q.trim()) {
@@ -29,8 +30,8 @@ export default function SearchAutocomplete({ placeholder = 'Search 1,252 careers
       setIsOpen(false);
       return;
     }
-    const fuse = createSearchIndex(careers);
-    const results = fuse.search(q, { limit: 8 }).map(r => r.item);
+    if (!fuseRef.current) fuseRef.current = createSearchIndex(careers);
+    const results = fuseRef.current.search(q, { limit: 8 }).map(r => r.item);
     setSuggestions(results);
     setIsOpen(results.length > 0);
     setActiveIndex(-1);

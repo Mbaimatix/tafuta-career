@@ -31,15 +31,17 @@ export default function Footer() {
               <li><Link href="/pathway/A" className="text-slate-400 hover:text-white text-sm transition-colors">Pathway A — STEM</Link></li>
               <li><Link href="/pathway/B" className="text-slate-400 hover:text-white text-sm transition-colors">Pathway B — Arts & Sports Science</Link></li>
               <li><Link href="/pathway/C" className="text-slate-400 hover:text-white text-sm transition-colors">Pathway C — Social Sciences</Link></li>
-              <li><Link href="/pathway/A/A1" className="text-slate-400 hover:text-white text-sm transition-colors">A1 — Pure & Applied Sciences</Link></li>
-              <li><Link href="/pathway/A/A2" className="text-slate-400 hover:text-white text-sm transition-colors">A2 — Engineering & Technology</Link></li>
-              <li><Link href="/pathway/A/A3" className="text-slate-400 hover:text-white text-sm transition-colors">A3 — Technical & Vocational</Link></li>
-              <li><Link href="/pathway/B/B1" className="text-slate-400 hover:text-white text-sm transition-colors">B1 — Performing & Creative Arts</Link></li>
-              <li><Link href="/pathway/B/B2" className="text-slate-400 hover:text-white text-sm transition-colors">B2 — Languages & Communication</Link></li>
-              <li><Link href="/pathway/B/B3" className="text-slate-400 hover:text-white text-sm transition-colors">B3 — Sports Science</Link></li>
-              <li><Link href="/pathway/C/C1" className="text-slate-400 hover:text-white text-sm transition-colors">C1 — Humanities, Law & Governance</Link></li>
-              <li><Link href="/pathway/C/C2" className="text-slate-400 hover:text-white text-sm transition-colors">C2 — Business & Entrepreneurship</Link></li>
-              <li><Link href="/pathway/C/C3" className="text-slate-400 hover:text-white text-sm transition-colors">C3 — Agriculture & Environment</Link></li>
+              <div className="hidden md:contents">
+                <li><Link href="/pathway/A/A1" className="text-slate-400 hover:text-white text-sm transition-colors">A1 — Pure & Applied Sciences</Link></li>
+                <li><Link href="/pathway/A/A2" className="text-slate-400 hover:text-white text-sm transition-colors">A2 — Engineering & Technology</Link></li>
+                <li><Link href="/pathway/A/A3" className="text-slate-400 hover:text-white text-sm transition-colors">A3 — Technical & Vocational</Link></li>
+                <li><Link href="/pathway/B/B1" className="text-slate-400 hover:text-white text-sm transition-colors">B1 — Performing & Creative Arts</Link></li>
+                <li><Link href="/pathway/B/B2" className="text-slate-400 hover:text-white text-sm transition-colors">B2 — Languages & Communication</Link></li>
+                <li><Link href="/pathway/B/B3" className="text-slate-400 hover:text-white text-sm transition-colors">B3 — Sports Science</Link></li>
+                <li><Link href="/pathway/C/C1" className="text-slate-400 hover:text-white text-sm transition-colors">C1 — Humanities, Law & Governance</Link></li>
+                <li><Link href="/pathway/C/C2" className="text-slate-400 hover:text-white text-sm transition-colors">C2 — Business & Entrepreneurship</Link></li>
+                <li><Link href="/pathway/C/C3" className="text-slate-400 hover:text-white text-sm transition-colors">C3 — Agriculture & Environment</Link></li>
+              </div>
             </ul>
           </div>
 

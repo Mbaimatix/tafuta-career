@@ -11,7 +11,7 @@ function getFeaturedCareers() {
   const pathwayCodes = ['A', 'B', 'C'];
   for (const code of pathwayCodes) {
     const pathwayCareers = careers.filter(c => c.pathwayCode === code && c.growthOutlook === 'High');
-    const shuffled = pathwayCareers.sort(() => 0.5 - Math.random()).slice(0, 2);
+    const shuffled = pathwayCareers.slice(0, 2);
     featured.push(...shuffled);
   }
   return featured;

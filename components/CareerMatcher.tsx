@@ -44,6 +44,7 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
   const [selectedPathway, setSelectedPathway] = useState<string>('');
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [results, setResults] = useState<MatchResult[]>([]);
+  const [copied, setCopied] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const allSubjectNames = new Set(allSubjects.map(s => s.name));
@@ -84,7 +85,8 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
     url.searchParams.set('pathway', selectedPathway);
     url.searchParams.set('subjects', selectedSubjects.join(','));
     navigator.clipboard.writeText(url.toString()).then(() => {
-      alert('Link copied to clipboard!');
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     });
   }
 
@@ -123,7 +125,7 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
       </div>
 
       {/* Step content */}
-      <div className="overflow-hidden relative min-h-[500px]">
+      <div className="overflow-x-hidden overflow-y-visible relative min-h-[500px]">
         <AnimatePresence mode="wait" custom={direction}>
           {step === 1 && (
             <motion.div
@@ -141,7 +143,7 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
                 </h2>
                 <p className="text-slate-500 dark:text-slate-400">Select your CBC academic pathway to get started</p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {(Object.entries(PATHWAY_INFO) as [string, typeof PATHWAY_INFO['A']][]).map(([code, info]) => {
                   const Icon = info.icon;
                   const selected = selectedPathway === code;
@@ -297,7 +299,8 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
                     onClick={handleShare}
                     className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
                   >
-                    <Share2 className="w-4 h-4" /> Share Results
+                    <Share2 className="w-4 h-4" />
+                    {copied ? 'Copied!' : 'Share Results'}
                   </button>
                   <button
                     type="button"

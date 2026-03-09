@@ -49,10 +49,19 @@ export default function Navbar() {
     setPathwaysOpen(false);
   }, [pathname]);
 
+  useEffect(() => {
+    if (!pathwaysOpen) return;
+    const handler = () => setPathwaysOpen(false);
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, [pathwaysOpen]);
+
+  const isHeroPage = pathname === '/';
+
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
+        scrolled || !isHeroPage
           ? 'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-md border-b border-slate-200 dark:border-slate-700'
           : 'bg-transparent'
       }`}
@@ -166,7 +175,7 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 shadow-lg">
+        <div className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 shadow-lg">
           <div className="px-4 py-3 space-y-1">
             <Link href="/" className="block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800">
               Home

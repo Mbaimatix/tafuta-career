@@ -17,12 +17,14 @@ function SearchContent() {
   const [pathwayFilter, setPathwayFilter] = useState('');
   const [sortMode, setSortMode] = useState<'relevance' | 'alpha'>('relevance');
   const [results, setResults] = useState(searchCareers(initialQuery, careers));
+  const [visibleCount, setVisibleCount] = useState(60);
 
   const runSearch = useCallback((q: string) => {
     let found = searchCareers(q, careers);
     if (pathwayFilter) found = found.filter(c => c.pathwayCode === pathwayFilter);
     if (sortMode === 'alpha') found = [...found].sort((a, b) => a.name.localeCompare(b.name));
     setResults(found);
+    setVisibleCount(60);
   }, [pathwayFilter, sortMode]);
 
   // Debounce: update query 300ms after user stops typing
@@ -169,16 +171,22 @@ function SearchContent() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {results.slice(0, 60).map((career, i) => (
+            {results.slice(0, visibleCount).map((career, i) => (
               <CareerCard key={career.id} career={career} index={i} />
             ))}
           </div>
         )}
 
-        {results.length > 60 && (
-          <p className="text-center text-slate-500 dark:text-slate-400 mt-8 text-sm">
-            Showing 60 of {results.length} results. Refine your search to see more.
-          </p>
+        {results.length > visibleCount && (
+          <div className="text-center mt-8">
+            <button
+              type="button"
+              onClick={() => setVisibleCount(v => v + 60)}
+              className="px-8 py-3 rounded-xl bg-green-600 text-white font-semibold hover:bg-green-700 transition-colors shadow-md"
+            >
+              Load More ({results.length - visibleCount} remaining)
+            </button>
+          </div>
         )}
       </div>
     </div>

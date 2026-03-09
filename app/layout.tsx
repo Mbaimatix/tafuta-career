@@ -13,13 +13,17 @@ export const metadata: Metadata = {
     title: 'TAFUTA CAREER | CBC Career Guidance for Kenyan Students',
     description: "Gundua Njia Yako ya Kazi — Discover your career path based on Kenya's CBC curriculum.",
     type: 'website',
+    url: 'https://tafuta-career.vercel.app',
+    images: [{ url: 'https://tafuta-career.vercel.app/og-image.png', width: 1200, height: 630, alt: 'TAFUTA CAREER' }],
     locale: 'en_KE',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'TAFUTA CAREER | CBC Career Guidance',
     description: "Discover your ideal career path based on Kenya's CBC curriculum.",
+    images: ['https://tafuta-career.vercel.app/og-image.png'],
   },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
