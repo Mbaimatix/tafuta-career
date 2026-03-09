@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tafuta-career.vercel.app/sitemap.xml
