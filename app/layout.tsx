@@ -3,6 +3,7 @@ import { ThemeProvider } from 'next-themes';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import ChatBot from '@/components/ChatBot';
 
 export const metadata: Metadata = {
   title: 'TAFUTA CAREER | CBC Career Guidance for Kenyan Students',
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
           </main>
           <Footer />
+          <ChatBot />
         </ThemeProvider>
       </body>
     </html>
