@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/Badge';
 import { CareerCard } from '@/components/CareerCard';
 import { TrendingUp, TrendingDown, Minus, GraduationCap, DollarSign, ChevronRight } from 'lucide-react';
 import CareerActions from './ShareButton';
+import ProCareerSections from './ProCareerSections';
 
 export async function generateStaticParams() {
   return careers.map(c => ({ id: String(c.id) }));
@@ -139,8 +140,9 @@ export default async function CareerPage({ params }: { params: Promise<{ id: str
                 </div>
               </div>
 
-              {/* Actions */}
+              {/* Actions (Share + Print[PRO] + Save[PRO]) */}
               <CareerActions careerName={career.name} />
+              <ProCareerSections career={career} />
             </div>
 
             {/* Sidebar */}

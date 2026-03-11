@@ -6,6 +6,8 @@ import { ChevronLeft, ChevronRight, RotateCcw, Share2, Printer, FlaskConical, Pa
 import type { Career, Subject } from '@/lib/career-data';
 import { matchCareers, type MatchResult } from '@/lib/matching';
 import { CareerCard } from '@/components/CareerCard';
+import { useProStatus } from '@/context/ProContext';
+import ProUpgradeModal from '@/components/ProUpgradeModal';
 
 interface CareerMatcherProps {
   allCareers: Career[];
@@ -45,7 +47,11 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [results, setResults] = useState<MatchResult[]>([]);
   const [copied, setCopied] = useState(false);
+  const [proModalOpen, setProModalOpen] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const { isPro } = useProStatus();
+
+  const FREE_LIMIT = 5;
 
   const allSubjectNames = new Set(allSubjects.map(s => s.name));
 
@@ -320,23 +326,63 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
                   </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {results.slice(0, 30).map((result, i) => (
-                    <CareerCard
-                      key={result.career.id}
-                      career={result.career}
-                      showMatch
-                      matchPercentage={result.matchPercentage}
-                      matchedSubjects={result.matchedSubjects}
-                      index={i}
-                    />
-                  ))}
-                </div>
+                <>
+                  {/* Free users: first 5 results */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {results.slice(0, isPro ? 50 : FREE_LIMIT).map((result, i) => (
+                      <CareerCard
+                        key={result.career.id}
+                        career={result.career}
+                        showMatch
+                        matchPercentage={result.matchPercentage}
+                        matchedSubjects={result.matchedSubjects}
+                        index={i}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Locked overlay for remaining results (free users only) */}
+                  {!isPro && results.length > FREE_LIMIT && (
+                    <div className="mt-6 relative rounded-2xl overflow-hidden border-2 border-dashed border-amber-300 dark:border-amber-600">
+                      {/* Blurred ghost cards */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 filter blur-sm pointer-events-none select-none" aria-hidden>
+                        {results.slice(FREE_LIMIT, FREE_LIMIT + 3).map((result) => (
+                          <div key={result.career.id} className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 h-36" />
+                        ))}
+                      </div>
+                      {/* Lock banner */}
+                      <div className="absolute inset-0 flex flex-col items-center justify-center"
+                        style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(4px)' }}>
+                        <p className="font-black text-slate-800 text-lg mb-1">
+                          🔒 {results.length - FREE_LIMIT} more matches
+                        </p>
+                        <p className="text-sm text-slate-500 mb-4 text-center max-w-xs">
+                          Upgrade to TAFUTA PRO to see all {results.length} career matches with advanced sorting
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => setProModalOpen(true)}
+                          className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-white hover:opacity-90 transition-opacity"
+                          style={{ background: '#006600' }}
+                        >
+                          Unlock All Matches — Upgrade to PRO
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </motion.div>
           )}
         </AnimatePresence>
       </div>
+
+      {/* PRO upgrade modal for matcher results */}
+      <ProUpgradeModal
+        isOpen={proModalOpen}
+        onClose={() => setProModalOpen(false)}
+        triggerFeature="all your Career Matcher results"
+      />
 
       {/* Navigation buttons */}
       <div ref={step !== 3 ? undefined : resultsRef} className="flex items-center justify-between mt-8 no-print">

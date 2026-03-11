@@ -7,7 +7,8 @@ const CSP = [
   "img-src 'self' data: https: blob:",
   "font-src 'self' https://fonts.gstatic.com",
   "frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com",
-  "connect-src 'self' https://pagead2.googlesyndication.com https://www.google-analytics.com",
+  // sandbox.safaricom.co.ke is called server-side from API routes, but included here for completeness
+  "connect-src 'self' https://pagead2.googlesyndication.com https://www.google-analytics.com https://sandbox.safaricom.co.ke",
 ].join('; ');
 
 const SECURITY_HEADERS = [

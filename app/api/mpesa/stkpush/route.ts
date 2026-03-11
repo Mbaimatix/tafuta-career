@@ -1,0 +1,119 @@
+/**
+ * POST /api/mpesa/stkpush
+ * Initiates a Safaricom STK Push (Lipa Na M-Pesa) to the customer's phone.
+ *
+ * Body: { phone: string, plan: "monthly" | "annual" }
+ * - phone: Kenyan mobile number in any format (07XX, 7XX, 2547XX)
+ * - plan:  subscription plan — amount is enforced server-side (never trusted from client)
+ *
+ * Returns the full Daraja response including CheckoutRequestID.
+ */
+
+import { NextResponse } from 'next/server';
+
+/** Generate a Daraja-compatible timestamp: YYYYMMDDHHmmss */
+function generateTimestamp(): string {
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return (
+    now.getFullYear() +
+    pad(now.getMonth() + 1) +
+    pad(now.getDate()) +
+    pad(now.getHours()) +
+    pad(now.getMinutes()) +
+    pad(now.getSeconds())
+  );
+}
+
+/** Normalise any Kenyan phone format to 2547XXXXXXXX */
+function normalizePhone(phone: string): string | null {
+  const digits = phone.replace(/\D/g, '');
+  if (/^2547\d{8}$/.test(digits)) return digits;
+  if (/^07\d{8}$/.test(digits)) return '254' + digits.slice(1);
+  if (/^7\d{8}$/.test(digits)) return '254' + digits;
+  return null;
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = (await request.json()) as { phone?: string; plan?: string };
+    const { phone: rawPhone, plan } = body;
+
+    // --- Input validation ---
+    if (!rawPhone || !plan) {
+      return NextResponse.json({ error: 'Missing phone or plan' }, { status: 400 });
+    }
+    if (plan !== 'monthly' && plan !== 'annual') {
+      return NextResponse.json({ error: 'Invalid plan' }, { status: 400 });
+    }
+
+    const phone = normalizePhone(rawPhone);
+    if (!phone) {
+      return NextResponse.json({ error: 'Invalid phone number format' }, { status: 400 });
+    }
+
+    // --- Server-side amount enforcement — never trust the client ---
+    const amount = plan === 'annual' ? 999 : 199;
+
+    // --- Fetch Daraja access token ---
+    const key = process.env.MPESA_CONSUMER_KEY;
+    const secret = process.env.MPESA_CONSUMER_SECRET;
+    const shortcode = process.env.MPESA_SHORTCODE;
+    const passkey = process.env.MPESA_PASSKEY;
+    const callbackUrl = process.env.MPESA_CALLBACK_URL;
+
+    if (!key || !secret || !shortcode || !passkey || !callbackUrl) {
+      throw new Error('M-Pesa environment variables not fully configured');
+    }
+
+    const credentials = Buffer.from(`${key}:${secret}`).toString('base64');
+    const tokenRes = await fetch(
+      'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials',
+      { headers: { Authorization: `Basic ${credentials}` }, cache: 'no-store' }
+    );
+    if (!tokenRes.ok) throw new Error('Failed to obtain M-Pesa access token');
+    const { access_token } = (await tokenRes.json()) as { access_token: string };
+
+    // --- Build STK Push payload ---
+    const timestamp = generateTimestamp();
+    const password = Buffer.from(`${shortcode}${passkey}${timestamp}`).toString('base64');
+
+    const stkPayload = {
+      BusinessShortCode: shortcode,
+      Password: password,
+      Timestamp: timestamp,
+      TransactionType: 'CustomerPayBillOnline',
+      Amount: amount,
+      PartyA: phone,
+      PartyB: shortcode,
+      PhoneNumber: phone,
+      CallBackURL: callbackUrl,
+      AccountReference: 'TafutaCareerPRO',
+      TransactionDesc: 'Tafuta Career PRO Subscription',
+    };
+
+    const stkRes = await fetch(
+      'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(stkPayload),
+      }
+    );
+
+    const stkData = await stkRes.json();
+
+    if (!stkRes.ok || stkData?.ResponseCode !== '0') {
+      throw new Error(stkData?.errorMessage ?? stkData?.ResponseDescription ?? 'STK Push failed');
+    }
+
+    return NextResponse.json(stkData);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    console.error('[M-Pesa STK Push]', message);
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
