@@ -1,26 +1,12 @@
 /**
  * POST /api/mpesa/callback
  * Receives STK Push callback from Safaricom servers.
- * On success (ResultCode 0) it stores the payment result in memory so
- * that /api/mpesa/query can confirm payment to the frontend.
- *
- * TODO: Replace the in-memory store with a persistent database
- * (Supabase / Firebase / MongoDB) before going to production.
+ * On success (ResultCode 0) it stores the payment result in Vercel KV so
+ * that /api/mpesa/query can confirm payment to the frontend across serverless
+ * instances. Falls back to in-memory if KV is not configured.
  */
 
 import { NextResponse } from 'next/server';
-
-/** Temporary in-memory map: CheckoutRequestID → payment result */
-export const paymentResults = new Map<
-  string,
-  {
-    success: boolean;
-    receipt?: string;
-    amount?: number;
-    phone?: string;
-    transactionDate?: string;
-  }
->();
 
 interface CallbackMetadataItem {
   Name: string;
@@ -33,6 +19,29 @@ interface StkCallback {
   ResultCode: number;
   ResultDesc: string;
   CallbackMetadata?: { Item: CallbackMetadataItem[] };
+}
+
+interface PaymentResult {
+  success: boolean;
+  receipt?: string;
+  amount?: number;
+  phone?: string;
+  transactionDate?: string;
+}
+
+/** Fallback in-memory store (single instance / local dev only) */
+export const paymentResults = new Map<string, PaymentResult>();
+
+async function storeResult(checkoutRequestID: string, result: PaymentResult) {
+  // Try Vercel KV first (persists across serverless instances)
+  try {
+    const { kv } = await import('@vercel/kv');
+    await kv.set(`mpesa:${checkoutRequestID}`, JSON.stringify(result), { ex: 3600 });
+    return;
+  } catch {
+    // KV not configured — fall back to in-memory (works for local dev / single instance)
+  }
+  paymentResults.set(checkoutRequestID, result);
 }
 
 export async function POST(request: Request) {
@@ -50,8 +59,7 @@ export async function POST(request: Request) {
     if (ResultCode === 0) {
       // --- Successful payment ---
       const items = CallbackMetadata?.Item ?? [];
-      const get = (name: string) =>
-        items.find((i) => i.Name === name)?.Value;
+      const get = (name: string) => items.find((i) => i.Name === name)?.Value;
 
       const receipt = get('MpesaReceiptNumber') as string | undefined;
       const amount = get('Amount') as number | undefined;
@@ -66,8 +74,7 @@ export async function POST(request: Request) {
         txDate,
       });
 
-      // TODO: persist to database here (replace in-memory map)
-      paymentResults.set(CheckoutRequestID, {
+      await storeResult(CheckoutRequestID, {
         success: true,
         receipt,
         amount,
@@ -80,7 +87,7 @@ export async function POST(request: Request) {
         ResultCode,
         ResultDesc: callback.ResultDesc,
       });
-      paymentResults.set(CheckoutRequestID, { success: false });
+      await storeResult(CheckoutRequestID, { success: false });
     }
 
     // Safaricom requires a 200 with this exact shape

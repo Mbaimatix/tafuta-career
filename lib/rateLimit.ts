@@ -14,21 +14,26 @@ function createLimiter(maxRequests: number, windowMs: number): Limiter {
   const store = new Map<string, RateLimitEntry>();
 
   return (ip: string): RateLimitResult => {
-    const now = Date.now();
-    const entry = store.get(ip);
+    try {
+      const now = Date.now();
+      const entry = store.get(ip);
 
-    if (!entry || now - entry.windowStart >= windowMs) {
-      store.set(ip, { count: 1, windowStart: now });
+      if (!entry || now - entry.windowStart >= windowMs) {
+        store.set(ip, { count: 1, windowStart: now });
+        return { allowed: true, retryAfter: 0 };
+      }
+
+      if (entry.count >= maxRequests) {
+        const retryAfter = Math.ceil((entry.windowStart + windowMs - now) / 1000);
+        return { allowed: false, retryAfter };
+      }
+
+      entry.count++;
+      return { allowed: true, retryAfter: 0 };
+    } catch {
+      // On cold start or unexpected error, allow the request rather than blocking
       return { allowed: true, retryAfter: 0 };
     }
-
-    if (entry.count >= maxRequests) {
-      const retryAfter = Math.ceil((entry.windowStart + windowMs - now) / 1000);
-      return { allowed: false, retryAfter };
-    }
-
-    entry.count++;
-    return { allowed: true, retryAfter: 0 };
   };
 }
 

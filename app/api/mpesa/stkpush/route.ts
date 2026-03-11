@@ -11,6 +11,11 @@
 
 import { NextResponse } from 'next/server';
 
+const MPESA_BASE =
+  process.env.MPESA_ENV === 'production'
+    ? 'https://api.safaricom.co.ke'
+    : 'https://sandbox.safaricom.co.ke';
+
 /** Generate a Daraja-compatible timestamp: YYYYMMDDHHmmss */
 function generateTimestamp(): string {
   const now = new Date();
@@ -68,7 +73,7 @@ export async function POST(request: Request) {
 
     const credentials = Buffer.from(`${key}:${secret}`).toString('base64');
     const tokenRes = await fetch(
-      'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials',
+      `${MPESA_BASE}/oauth/v1/generate?grant_type=client_credentials`,
       { headers: { Authorization: `Basic ${credentials}` }, cache: 'no-store' }
     );
     if (!tokenRes.ok) throw new Error('Failed to obtain M-Pesa access token');
@@ -93,7 +98,7 @@ export async function POST(request: Request) {
     };
 
     const stkRes = await fetch(
-      'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest',
+      `${MPESA_BASE}/mpesa/stkpush/v1/processrequest`,
       {
         method: 'POST',
         headers: {

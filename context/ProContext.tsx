@@ -27,7 +27,7 @@ interface ProContextValue {
   isPro: boolean;
   proExpiry: number | null;
   /** Activate PRO after a successful M-Pesa payment. */
-  activatePro: (phone: string, plan: 'monthly' | 'annual') => void;
+  activatePro: (phone: string, plan: 'monthly' | 'annual', checkoutRequestID?: string) => void;
   /** Read and validate the current PRO status from localStorage. */
   checkProStatus: () => ProStatusData;
 }
@@ -72,9 +72,10 @@ export function ProContextProvider({ children }: { children: ReactNode }) {
 
   /**
    * Called after a confirmed M-Pesa payment.
-   * Sets localStorage and updates context state immediately.
+   * Sets localStorage and updates context state immediately,
+   * then fires a best-effort server-side record via /api/pro/activate.
    */
-  const activatePro = useCallback((phone: string, plan: 'monthly' | 'annual') => {
+  const activatePro = useCallback((phone: string, plan: 'monthly' | 'annual', checkoutRequestID?: string) => {
     const daysToAdd = plan === 'annual' ? 365 : 30;
     const expiry = Date.now() + daysToAdd * 24 * 60 * 60 * 1000;
 
@@ -89,6 +90,17 @@ export function ProContextProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     setIsPro(true);
     setProExpiry(expiry);
+
+    // Best-effort server-side record — never blocks or throws to the caller
+    if (checkoutRequestID) {
+      fetch('/api/pro/activate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, plan, checkoutRequestID }),
+      }).catch(() => {
+        // Silently ignore — localStorage is the source of truth
+      });
+    }
   }, []);
 
   return (

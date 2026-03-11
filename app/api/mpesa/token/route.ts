@@ -7,6 +7,11 @@
 
 import { NextResponse } from 'next/server';
 
+const MPESA_BASE =
+  process.env.MPESA_ENV === 'production'
+    ? 'https://api.safaricom.co.ke'
+    : 'https://sandbox.safaricom.co.ke';
+
 /** In-memory token cache — valid for the lifetime of this serverless instance */
 let cachedToken: string | null = null;
 let tokenExpiry = 0;
@@ -23,7 +28,7 @@ async function getAccessToken(): Promise<string> {
   const credentials = Buffer.from(`${key}:${secret}`).toString('base64');
 
   const res = await fetch(
-    'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials',
+    `${MPESA_BASE}/oauth/v1/generate?grant_type=client_credentials`,
     { headers: { Authorization: `Basic ${credentials}` }, cache: 'no-store' }
   );
 
