@@ -7,6 +7,14 @@
  * - plan:  subscription plan — amount is enforced server-side (never trusted from client)
  *
  * Returns the full Daraja response including CheckoutRequestID.
+ *
+ * CREDENTIAL NOTES:
+ * - Sandbox credentials from developer.safaricom.co.ke expire periodically and must
+ *   be regenerated in the Daraja portal if you see 401/403 errors from Safaricom.
+ * - When going live, set MPESA_ENV=production in Vercel environment variables and
+ *   replace MPESA_CONSUMER_KEY, MPESA_CONSUMER_SECRET, MPESA_SHORTCODE, and
+ *   MPESA_PASSKEY with your production Daraja app credentials.
+ * - Never use sandbox credentials against MPESA_ENV=production or vice versa.
  */
 
 import { NextResponse } from 'next/server';
@@ -15,6 +23,18 @@ const MPESA_BASE =
   process.env.MPESA_ENV === 'production'
     ? 'https://api.safaricom.co.ke'
     : 'https://sandbox.safaricom.co.ke';
+
+// ── Startup diagnostic log ────────────────────────────────────────────────────
+// Visible in Vercel Function logs; confirms env vars are present without
+// leaking their values. If any show "MISSING", add them in Vercel dashboard.
+console.log('[M-Pesa Config] MPESA_ENV          :', process.env.MPESA_ENV ?? 'NOT SET (defaulting to sandbox)');
+console.log('[M-Pesa Config] MPESA_CONSUMER_KEY  :', process.env.MPESA_CONSUMER_KEY  ? 'present' : 'MISSING ⚠️');
+console.log('[M-Pesa Config] MPESA_CONSUMER_SECRET:', process.env.MPESA_CONSUMER_SECRET ? 'present' : 'MISSING ⚠️');
+console.log('[M-Pesa Config] MPESA_SHORTCODE     :', process.env.MPESA_SHORTCODE      ? 'present' : 'MISSING ⚠️');
+console.log('[M-Pesa Config] MPESA_PASSKEY       :', process.env.MPESA_PASSKEY        ? 'present' : 'MISSING ⚠️');
+console.log('[M-Pesa Config] MPESA_CALLBACK_URL  :', process.env.MPESA_CALLBACK_URL   ? 'present' : 'MISSING ⚠️');
+console.log('[M-Pesa Config] Base URL            :', MPESA_BASE);
+// ─────────────────────────────────────────────────────────────────────────────
 
 /** Generate a Daraja-compatible timestamp: YYYYMMDDHHmmss */
 function generateTimestamp(): string {
@@ -76,7 +96,14 @@ export async function POST(request: Request) {
       `${MPESA_BASE}/oauth/v1/generate?grant_type=client_credentials`,
       { headers: { Authorization: `Basic ${credentials}` }, cache: 'no-store' }
     );
-    if (!tokenRes.ok) throw new Error('Failed to obtain M-Pesa access token');
+    if (!tokenRes.ok) {
+      const rawBody = await tokenRes.text();
+      console.error('[M-Pesa Auth Error] Status :', tokenRes.status, tokenRes.statusText);
+      console.error('[M-Pesa Auth Error] Body   :', rawBody);
+      console.error('[M-Pesa Auth Error] Endpoint:', `${MPESA_BASE}/oauth/v1/generate?grant_type=client_credentials`);
+      console.error('[M-Pesa Auth Error] Hint   : 401 = wrong/expired credentials | 403 = app not whitelisted | check MPESA_ENV matches credential type (sandbox vs production)');
+      throw new Error(`Failed to obtain M-Pesa access token — HTTP ${tokenRes.status}: ${rawBody}`);
+    }
     const { access_token } = (await tokenRes.json()) as { access_token: string };
 
     // --- Build STK Push payload ---
