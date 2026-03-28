@@ -11,12 +11,12 @@ const pathways = [
   {
     code: 'A',
     name: 'Science, Technology, Engineering & Mathematics',
-    shortName: 'STEM',
+    shortName: 'ROOT',
     icon: FlaskConical,
     color: 'text-green-600',
     bg: 'bg-green-50 dark:bg-green-900/20',
     border: 'border-green-200 dark:border-green-800',
-    desc: 'The STEM pathway develops competencies in scientific inquiry, technological innovation, mathematical reasoning, and systematic problem-solving. Students in this pathway study subjects like Biology, Chemistry, Physics, Mathematics, and Computer Studies. It is Kenya\'s fastest-growing sector with the highest career demand.',
+    desc: 'The ROOT pathway develops competencies in scientific inquiry, technological innovation, mathematical reasoning, and systematic problem-solving. Students in this pathway study subjects like Biology, Chemistry, Physics, Mathematics, and Computer Studies. It is Kenya\'s fastest-growing sector with the highest career demand.',
     subTracks: ['Pure & Applied Sciences (A1)', 'Engineering & Technology (A2)', 'Technical & Vocational (A3)'],
   },
   {
@@ -44,7 +44,7 @@ const pathways = [
 ];
 
 const steps = [
-  { icon: BookOpen, step: '01', title: 'Know Your Pathway', desc: 'Identify which of the 3 CBC pathways you are enrolled in: STEM (A), Arts & Sports (B), or Social Sciences (C).' },
+  { icon: BookOpen, step: '01', title: 'Know Your Pathway', desc: 'Identify which of the 3 CBC pathways you are enrolled in: ROOT (A), Arts & Sports (B), or Social Sciences (C).' },
   { icon: Target, step: '02', title: 'Select Your Subjects', desc: 'Go to the Subject Explorer or Career Matcher and select all the subjects you currently study.' },
   { icon: Sparkles, step: '03', title: 'Discover Careers', desc: 'View your career matches with match percentage, salary ranges, growth outlook, and education requirements.' },
   { icon: CheckCircle, step: '04', title: 'Explore & Plan', desc: 'Click into any career to learn more, find related careers, and start planning your academic journey.' },

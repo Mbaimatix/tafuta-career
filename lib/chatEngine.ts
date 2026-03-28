@@ -44,7 +44,7 @@ function detectMentionedSubjects(message: string): string[] {
 
 function detectPathwayCode(message: string): string | null {
   const msg = lower(message);
-  if (/pathway\s*a\b|stem\b|pure science|applied science/.test(msg)) return 'A';
+  if (/pathway\s*a\b|stem\b|root\b|pure science|applied science/.test(msg)) return 'A';
   if (/pathway\s*b\b|arts\b|creative|sports science|performing/.test(msg)) return 'B';
   if (/pathway\s*c\b|social science|humanities|business|economics/.test(msg)) return 'C';
   return null;
@@ -62,7 +62,7 @@ function detectIntent(message: string): Intent {
   if (/high growth|fast growing|growing career|best career|top career|future career/.test(msg)) return 'high_growth';
   if (/university|degree|college|needs degree|requires university/.test(msg)) return 'university_required';
   if (/how (do i|to) use|how does (this|the site|it) work|get started|where (do i|to) start/.test(msg)) return 'how_to_use';
-  if (/pathway|stem\b|arts\b|social science/.test(msg)) return 'pathway_info';
+  if (/pathway|stem\b|root\b|arts\b|social science/.test(msg)) return 'pathway_info';
   if (detectMentionedSubjects(message).length > 0) return 'subject_search';
 
   // If any career name shows up in search results for the message, treat as career search
@@ -74,7 +74,7 @@ function detectIntent(message: string): Intent {
 function replyGreeting(): ChatMessage {
   return {
     role: 'bot',
-    text: "Habari! 👋 I'm the TAFUTA CAREER assistant. I can help you:\n\n• Find careers based on your subjects\n• Explore pathways (STEM, Arts & Sports, Social Sciences)\n• Learn about salary ranges and growth\n• Understand CBC subject requirements\n\nTry asking: \"I study Biology and Chemistry, what careers suit me?\"",
+    text: "Habari! 👋 I'm the TAFUTA CAREER assistant. I can help you:\n\n• Find careers based on your subjects\n• Explore pathways (ROOT, Arts & Sports, Social Sciences)\n• Learn about salary ranges and growth\n• Understand CBC subject requirements\n\nTry asking: \"I study Biology and Chemistry, what careers suit me?\"",
     links: [
       { label: 'Start Career Matcher', href: '/matcher' },
       { label: 'Explore Subjects', href: '/subjects' },

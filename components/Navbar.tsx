@@ -27,7 +27,7 @@ const navLinks = [
 ];
 
 const pathwayLinks = [
-  { href: '/pathway/A', label: 'Pathway A — STEM', icon: FlaskConical, color: 'text-green-600' },
+  { href: '/pathway/A', label: 'Pathway A — ROOT', icon: FlaskConical, color: 'text-green-600' },
   { href: '/pathway/B', label: 'Pathway B — Arts & Sports Science', icon: Palette, color: 'text-red-600' },
   { href: '/pathway/C', label: 'Pathway C — Social Sciences', icon: Globe, color: 'text-purple-600' },
 ];

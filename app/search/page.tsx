@@ -54,7 +54,7 @@ function SearchContent() {
     router.push('/search', { scroll: false });
   }
 
-  const pathwayLabels: Record<string, string> = { A: 'STEM', B: 'Arts & Sports', C: 'Social' };
+  const pathwayLabels: Record<string, string> = { A: 'ROOT', B: 'Arts & Sports', C: 'Social' };
 
   return (
     <div className="min-h-screen">

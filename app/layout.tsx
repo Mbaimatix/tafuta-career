@@ -9,7 +9,7 @@ import { ProContextProvider } from '@/context/ProContext';
 export const metadata: Metadata = {
   title: 'TAFUTA CAREER | CBC Career Guidance for Kenyan Students',
   description: "Discover your ideal career path based on Kenya's CBC curriculum. Explore 1,252 careers across 3 pathways and 9 sub-tracks. Find careers matching your subjects with our interactive Career Matcher.",
-  keywords: 'CBC Kenya, career guidance, STEM Kenya, pathway A, pathway B, pathway C, Kenyan students, career matcher',
+  keywords: 'CBC Kenya, career guidance, ROOT Kenya, STEM Kenya, pathway A, pathway B, pathway C, Kenyan students, career matcher',
   authors: [{ name: 'TAFUTA CAREER' }],
   openGraph: {
     title: 'TAFUTA CAREER | CBC Career Guidance for Kenyan Students',

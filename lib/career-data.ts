@@ -44,7 +44,7 @@ export const pathways: Pathway[] = [
   {
     code: "A",
     name: "Science, Technology, Engineering & Mathematics",
-    shortName: "STEM",
+    shortName: "ROOT",
     description: "Develop competencies in scientific inquiry, technological innovation, mathematical reasoning, and systematic problem-solving. Kenya's fastest-growing sector with the highest career demand.",
     icon: "flask-conical",
     color: "#006600",
