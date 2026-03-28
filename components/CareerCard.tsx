@@ -35,7 +35,7 @@ function pathwayVariant(code: string): 'green' | 'red' | 'purple' {
 }
 
 function pathwayLabel(code: string) {
-  if (code === 'A') return 'ROOT';
+  if (code === 'A') return 'STEM';
   if (code === 'B') return 'Arts & Sports';
   return 'Social Sciences';
 }

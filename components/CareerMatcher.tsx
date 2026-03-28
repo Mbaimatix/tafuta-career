@@ -15,7 +15,7 @@ interface CareerMatcherProps {
 }
 
 const PATHWAY_INFO = {
-  A: { label: 'ROOT', icon: FlaskConical, gradient: 'pathway-a', desc: 'Science, Technology, Engineering & Mathematics' },
+  A: { label: 'STEM', icon: FlaskConical, gradient: 'pathway-a', desc: 'Science, Technology, Engineering & Mathematics' },
   B: { label: 'Arts & Sports Science', icon: Palette, gradient: 'pathway-b', desc: 'Arts, Creative Industries & Sports Science' },
   C: { label: 'Social Sciences', icon: Globe, gradient: 'pathway-c', desc: 'Humanities, Business & Social Studies' },
 };

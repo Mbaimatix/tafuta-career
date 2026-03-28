@@ -151,7 +151,7 @@ export default function SearchAutocomplete({ placeholder = 'Search 1,252 careers
                 career.pathwayCode === 'B' ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' :
                 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300'
               }`}>
-                {career.pathwayCode === 'A' ? 'ROOT' : career.pathwayCode === 'B' ? 'Arts' : 'Social'}
+                {career.pathwayCode === 'A' ? 'STEM' : career.pathwayCode === 'B' ? 'Arts' : 'Social'}
               </span>
             </button>
           ))}

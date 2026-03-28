@@ -35,7 +35,7 @@ export default function HomePage() {
   ];
 
   const steps = [
-    { icon: BookOpen, title: 'Choose Your Pathway', desc: 'Select from ROOT, Arts & Sports, or Social Sciences based on your interests.', color: 'text-green-600', bg: 'bg-green-100 dark:bg-green-900/30' },
+    { icon: BookOpen, title: 'Choose Your Pathway', desc: 'Select from STEM, Arts & Sports, or Social Sciences based on your interests.', color: 'text-green-600', bg: 'bg-green-100 dark:bg-green-900/30' },
     { icon: Target, title: 'Pick Your Subjects', desc: 'Select the subjects you study to narrow down careers that match your studies.', color: 'text-amber-600', bg: 'bg-amber-100 dark:bg-amber-900/30' },
     { icon: Sparkles, title: 'Discover Careers', desc: 'View ranked career matches with salary info, growth outlook, and university requirements.', color: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/30' },
   ];

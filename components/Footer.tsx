@@ -28,7 +28,7 @@ export default function Footer() {
               Pathways
             </h4>
             <ul className="space-y-2">
-              <li><Link href="/pathway/A" className="text-slate-400 hover:text-white text-sm transition-colors">Pathway A — ROOT</Link></li>
+              <li><Link href="/pathway/A" className="text-slate-400 hover:text-white text-sm transition-colors">Pathway A — STEM</Link></li>
               <li><Link href="/pathway/B" className="text-slate-400 hover:text-white text-sm transition-colors">Pathway B — Arts & Sports Science</Link></li>
               <li><Link href="/pathway/C" className="text-slate-400 hover:text-white text-sm transition-colors">Pathway C — Social Sciences</Link></li>
               <div className="hidden md:contents">

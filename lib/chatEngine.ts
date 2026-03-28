@@ -74,7 +74,7 @@ function detectIntent(message: string): Intent {
 function replyGreeting(): ChatMessage {
   return {
     role: 'bot',
-    text: "Habari! 👋 I'm the TAFUTA CAREER assistant. I can help you:\n\n• Find careers based on your subjects\n• Explore pathways (ROOT, Arts & Sports, Social Sciences)\n• Learn about salary ranges and growth\n• Understand CBC subject requirements\n\nTry asking: \"I study Biology and Chemistry, what careers suit me?\"",
+    text: "Habari! 👋 I'm the TAFUTA CAREER assistant. I can help you:\n\n• Find careers based on your subjects\n• Explore pathways (STEM, Arts & Sports, Social Sciences)\n• Learn about salary ranges and growth\n• Understand CBC subject requirements\n\nTry asking: \"I study Biology and Chemistry, what careers suit me?\"",
     links: [
       { label: 'Start Career Matcher', href: '/matcher' },
       { label: 'Explore Subjects', href: '/subjects' },
