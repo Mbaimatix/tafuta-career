@@ -57,29 +57,22 @@ export default function HomePage() {
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-4 leading-tight animate-fade-in">
-            Discover Your Future
-            <br />
-            <span style={{ color: '#F59E0B' }}>Career Path</span>
+            Discover Your Future <span style={{ color: '#F59E0B' }}>Career Path</span>
           </h1>
 
-          <p className="text-xl text-white/80 mb-2 italic font-medium">
+          <p className="text-xl text-white/80 mb-1 italic font-medium">
             Gundua Njia Yako ya Kazi
           </p>
-          <p className="text-base text-white/70 mb-10 max-w-2xl mx-auto">
+          <p className="text-sm text-white/60 mb-8 italic">
+            (Discover Your Career Path)
+          </p>
+          <p className="text-base text-white/70 mb-8 max-w-2xl mx-auto">
             The most comprehensive CBC career guidance platform for Kenyan students.
             Match your subjects to 1,252 careers across all three pathways.
           </p>
 
-          {/* Search bar */}
-          <div className="max-w-2xl mx-auto mb-8">
-            <SearchAutocomplete
-              careers={careers}
-              placeholder="Search 1,252 careers — e.g. Doctor, Software Engineer, Teacher..."
-            />
-          </div>
-
           {/* CTA buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
             <Link
               href="/matcher"
               className="flex items-center gap-2 px-8 py-4 rounded-2xl font-bold text-white text-lg shadow-2xl transition-transform hover:scale-105"
@@ -94,17 +87,25 @@ export default function HomePage() {
               Explore by Subject
             </Link>
           </div>
+
+          {/* Search bar */}
+          <div className="max-w-2xl mx-auto mb-8">
+            <SearchAutocomplete
+              careers={careers}
+              placeholder="Search 1,252 careers — e.g. Doctor, Software Engineer, Teacher..."
+            />
+          </div>
         </div>
       </section>
 
       {/* Stats Strip */}
       <section className="bg-slate-900 py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {stats.map(stat => (
-              <div key={stat.label} className="text-center">
+          <div className="flex flex-wrap justify-center">
+            {stats.map((stat, i) => (
+              <div key={stat.label} className={`text-center px-8 py-2 ${i < stats.length - 1 ? 'border-r border-slate-700' : ''}`}>
                 <div className="text-3xl font-black text-white">{stat.value}</div>
-                <div className="text-sm text-slate-400">{stat.label}</div>
+                <p className="text-sm text-slate-400">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -174,8 +175,8 @@ export default function HomePage() {
 
       {/* Featured Careers */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <div>
+        <div className="relative flex items-center justify-center mb-8">
+          <div className="text-center">
             <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100 mb-1">
               Featured Careers
             </h2>
@@ -183,14 +184,14 @@ export default function HomePage() {
           </div>
           <Link
             href="/search"
-            className="flex items-center gap-1 text-sm font-semibold text-green-600 dark:text-green-400 hover:underline"
+            className="absolute right-0 flex items-center gap-1 text-sm font-semibold text-green-600 dark:text-green-400 hover:underline"
           >
             See all <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {featuredCareers.slice(0, 6).map((career, i) => (
-            <CareerCard key={career.id} career={career} index={i} />
+            <CareerCard key={career.id} career={career} index={i} hideNumber={true} />
           ))}
         </div>
       </section>

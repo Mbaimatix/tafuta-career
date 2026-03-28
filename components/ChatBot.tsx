@@ -65,7 +65,7 @@ export default function ChatBot() {
         type="button"
         onClick={() => setOpen(v => !v)}
         aria-label={open ? 'Close chat' : 'Open career assistant chat'}
-        className="fixed bottom-5 right-5 z-50 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-green-400"
+        className="fixed bottom-8 right-6 z-50 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-green-400"
         style={{ background: open ? '#BB0000' : '#006600' }}
       >
         {open
@@ -83,7 +83,7 @@ export default function ChatBot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.96 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="fixed bottom-24 right-5 z-50 w-[calc(100vw-40px)] sm:w-96 flex flex-col rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700"
+            className="fixed bottom-24 right-6 z-50 w-[calc(100vw-40px)] sm:w-96 flex flex-col rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700"
             style={{ maxHeight: 'min(560px, calc(100vh - 130px))' }}
           >
             {/* Header */}

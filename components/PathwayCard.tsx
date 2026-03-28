@@ -61,7 +61,7 @@ export function PathwayCard({ pathway, careerCount, subTrackCount, subTrackNames
           {subTrackNames.length > 0 && (
             <div className="space-y-1.5">
               <p className="text-white/60 text-xs font-semibold uppercase tracking-wide">
-                {subTrackCount} Sub-tracks
+                {subTrackCount} Sub-Tracks
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {subTrackNames.map(name => (

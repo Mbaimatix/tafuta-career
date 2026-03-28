@@ -113,16 +113,26 @@ export default function SearchAutocomplete({ placeholder = 'Search 1,252 careers
             onKeyDown={handleKeyDown}
             onFocus={() => query.trim() && suggestions.length > 0 && setIsOpen(true)}
             placeholder={placeholder}
-            className="w-full pl-12 pr-12 py-4 text-base rounded-2xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-green-500 dark:focus:border-green-400 shadow-lg transition-all"
+            className="w-full pl-12 pr-14 py-4 text-base rounded-2xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-green-500 dark:focus:border-green-400 shadow-lg transition-all"
             autoComplete="off"
           />
-          {query && (
+          {query ? (
             <button
               type="button"
               onClick={clearQuery}
               className="absolute right-4 p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+              aria-label="Clear search"
             >
               <X className="w-4 h-4" />
+            </button>
+          ) : (
+            <button
+              type="submit"
+              className="absolute right-3 p-2 rounded-xl text-white transition-colors"
+              style={{ background: '#006600' }}
+              aria-label="Search careers"
+            >
+              <Search className="w-4 h-4" />
             </button>
           )}
         </div>

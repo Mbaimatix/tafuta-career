@@ -14,6 +14,7 @@ interface CareerCardProps {
   matchPercentage?: number;
   matchedSubjects?: string[];
   index?: number;
+  hideNumber?: boolean;
 }
 
 function GrowthIcon({ outlook }: { outlook: string }) {
@@ -47,6 +48,7 @@ export function CareerCard({
   matchPercentage,
   matchedSubjects = [],
   index = 0,
+  hideNumber = false,
 }: CareerCardProps) {
   const displaySubjects = career.subjects.slice(0, 4);
   const extraSubjects = career.subjects.length - 4;
@@ -58,14 +60,16 @@ export function CareerCard({
       transition={{ duration: 0.3, delay: index * 0.05 }}
       className="card-hover"
     >
-      <Link href={`/career/${career.id}`} className="block">
+      <Link href={`/career/${career.id}`} aria-label={`View career: ${career.name}`} className="block">
         <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4 h-full flex flex-col gap-3">
           {/* Header row */}
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-center gap-2 min-w-0">
-              <span className="flex-shrink-0 text-xs font-mono bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded">
-                #{career.number}
-              </span>
+              {!hideNumber && (
+                <span className="flex-shrink-0 text-xs font-mono bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded">
+                  #{career.number}
+                </span>
+              )}
               <h3 className={`font-semibold text-slate-900 dark:text-slate-100 leading-tight line-clamp-2 ${compact ? 'text-sm' : 'text-base'}`}>
                 {career.name}
               </h3>

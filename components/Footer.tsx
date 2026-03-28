@@ -15,7 +15,8 @@ export default function Footer() {
               </div>
               <span className="font-black text-lg text-white tracking-tight">TAFUTA CAREER</span>
             </div>
-            <p className="text-slate-400 text-sm italic mb-4">Gundua Njia Yako ya Kazi</p>
+            <p className="text-slate-400 text-sm italic mb-1">Gundua Njia Yako ya Kazi</p>
+            <p className="text-slate-500 text-xs italic mb-4">(Discover Your Career Path)</p>
             <p className="text-slate-500 text-xs leading-relaxed">
               Helping Kenyan students navigate the CBC curriculum and discover their ideal career paths.
             </p>
@@ -29,20 +30,20 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2">
               <li><Link href="/pathway/A" className="text-slate-400 hover:text-white text-sm transition-colors">Pathway A — STEM</Link></li>
-              <li><Link href="/pathway/B" className="text-slate-400 hover:text-white text-sm transition-colors">Pathway B — Arts & Sports Science</Link></li>
+              <li><Link href="/pathway/B" className="text-slate-400 hover:text-white text-sm transition-colors">Pathway B — Arts & Sports</Link></li>
               <li><Link href="/pathway/C" className="text-slate-400 hover:text-white text-sm transition-colors">Pathway C — Social Sciences</Link></li>
-              <div className="hidden md:contents">
-                <li><Link href="/pathway/A/A1" className="text-slate-400 hover:text-white text-sm transition-colors">A1 — Pure & Applied Sciences</Link></li>
-                <li><Link href="/pathway/A/A2" className="text-slate-400 hover:text-white text-sm transition-colors">A2 — Engineering & Technology</Link></li>
-                <li><Link href="/pathway/A/A3" className="text-slate-400 hover:text-white text-sm transition-colors">A3 — Technical & Vocational</Link></li>
-                <li><Link href="/pathway/B/B1" className="text-slate-400 hover:text-white text-sm transition-colors">B1 — Performing & Creative Arts</Link></li>
-                <li><Link href="/pathway/B/B2" className="text-slate-400 hover:text-white text-sm transition-colors">B2 — Languages & Communication</Link></li>
-                <li><Link href="/pathway/B/B3" className="text-slate-400 hover:text-white text-sm transition-colors">B3 — Sports Science</Link></li>
-                <li><Link href="/pathway/C/C1" className="text-slate-400 hover:text-white text-sm transition-colors">C1 — Humanities, Law & Governance</Link></li>
-                <li><Link href="/pathway/C/C2" className="text-slate-400 hover:text-white text-sm transition-colors">C2 — Business & Entrepreneurship</Link></li>
-                <li><Link href="/pathway/C/C3" className="text-slate-400 hover:text-white text-sm transition-colors">C3 — Agriculture & Environment</Link></li>
-              </div>
             </ul>
+            <div className="hidden md:block mt-3 pt-3 border-t border-slate-700 space-y-1 pl-2">
+              <div><Link href="/pathway/A/A1" className="text-slate-400 hover:text-white text-sm transition-colors">A1 — Pure & Applied Sciences</Link></div>
+              <div><Link href="/pathway/A/A2" className="text-slate-400 hover:text-white text-sm transition-colors">A2 — Engineering & Technology</Link></div>
+              <div><Link href="/pathway/A/A3" className="text-slate-400 hover:text-white text-sm transition-colors">A3 — Technical & Vocational</Link></div>
+              <div><Link href="/pathway/B/B1" className="text-slate-400 hover:text-white text-sm transition-colors">B1 — Performing & Creative Arts</Link></div>
+              <div><Link href="/pathway/B/B2" className="text-slate-400 hover:text-white text-sm transition-colors">B2 — Languages & Communication</Link></div>
+              <div><Link href="/pathway/B/B3" className="text-slate-400 hover:text-white text-sm transition-colors">B3 — Sports Science & Recreation</Link></div>
+              <div><Link href="/pathway/C/C1" className="text-slate-400 hover:text-white text-sm transition-colors">C1 — Humanities, Law & Governance</Link></div>
+              <div><Link href="/pathway/C/C2" className="text-slate-400 hover:text-white text-sm transition-colors">C2 — Business & Entrepreneurship</Link></div>
+              <div><Link href="/pathway/C/C3" className="text-slate-400 hover:text-white text-sm transition-colors">C3 — Agriculture & Environment</Link></div>
+            </div>
           </div>
 
           {/* Tools */}
@@ -83,7 +84,7 @@ export default function Footer() {
             ].map(stat => (
               <div key={stat.label} className="text-center">
                 <div className="text-2xl font-black text-white">{stat.value}</div>
-                <div className="text-xs text-slate-500">{stat.label}</div>
+                <p className="text-xs text-slate-500">{stat.label}</p>
               </div>
             ))}
           </div>
