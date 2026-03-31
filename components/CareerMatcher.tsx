@@ -32,7 +32,8 @@ const SUBJECT_GROUPS: { label: string; subjects: string[] }[] = [
   { label: 'Arts, Sports & Creative', subjects: ['Fine Art', 'Music', 'Music & Dance', 'Physical Education', 'Sport & Recreation', 'Theatre & Film'] },
 ];
 
-const MAX_SUBJECTS = 3;
+const MAX_SUBJECTS = 8;
+const MIN_SUBJECTS = 3;
 
 const SLIDE_VARIANTS = {
   enter: (dir: number) => ({ x: dir > 0 ? 300 : -300, opacity: 0 }),
@@ -101,7 +102,7 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
   }
 
   const atMax = selectedSubjects.length >= MAX_SUBJECTS;
-  const canProceed = step === 1 ? !!selectedPathway : step === 2 ? selectedSubjects.length > 0 : false;
+  const canProceed = step === 1 ? !!selectedPathway : step === 2 ? selectedSubjects.length >= MIN_SUBJECTS : false;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -196,7 +197,7 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
                   Which subjects do you take?
                 </h2>
                 <p className="text-slate-500 dark:text-slate-400 mb-3">
-                  Select up to 3 elective subjects (CBC rule: 1 track + 3 electives)
+                  Select between 3 and 8 subjects to match your career
                 </p>
                 <div className="flex items-center justify-center gap-3">
                   <span className={`inline-block px-4 py-1.5 rounded-full text-sm font-bold border-2 ${
@@ -226,11 +227,19 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
                 </div>
               )}
 
+              {selectedSubjects.length > 0 && selectedSubjects.length < MIN_SUBJECTS && (
+                <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-xl flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                  <p className="text-sm text-blue-700 dark:text-blue-400 font-medium">
+                    Select at least {MIN_SUBJECTS} subjects to find your matches ({MIN_SUBJECTS - selectedSubjects.length} more needed).
+                  </p>
+                </div>
+              )}
               {atMax && (
                 <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
                   <p className="text-sm text-amber-700 dark:text-amber-400 font-medium">
-                    Maximum 3 subjects reached. Deselect one to choose a different subject.
+                    Maximum 8 subjects reached. Deselect one to choose a different subject.
                   </p>
                 </div>
               )}
