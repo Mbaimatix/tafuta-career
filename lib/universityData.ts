@@ -1,7 +1,7 @@
 /**
  * universityData.ts
  * Maps CBC sub-tracks to relevant Kenyan university programmes.
- * Used by the PRO career detail page to show university options.
+ * Used by the career detail page and the /saved comparison table.
  */
 
 import type { Career } from './career-data';
