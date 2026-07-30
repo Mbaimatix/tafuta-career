@@ -14,10 +14,8 @@ import {
   FlaskConical,
   Palette,
   Globe,
-  Star,
+  Bookmark,
 } from 'lucide-react';
-import { useProStatus } from '@/context/ProContext';
-import ProUpgradeModal from '@/components/ProUpgradeModal';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -37,10 +35,8 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [pathwaysOpen, setPathwaysOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [proModalOpen, setProModalOpen] = useState(false);
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
-  const { isPro } = useProStatus();
 
   useEffect(() => {
     setMounted(true);
@@ -145,27 +141,17 @@ export default function Navbar() {
 
           {/* Right side icons */}
           <div className="flex items-center gap-2">
-            {/* PRO upgrade nudge — hidden for existing PRO users */}
-            {mounted && !isPro && (
-              <button
-                type="button"
-                onClick={() => setProModalOpen(true)}
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors hover:opacity-90"
-                style={{ background: '#F59E0B', color: 'white' }}
-                aria-label="Upgrade to TAFUTA PRO"
-              >
-                <Star className="w-3.5 h-3.5" />
-                Try PRO
-              </button>
-            )}
-            {mounted && isPro && (
-              <span
-                className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold"
-                style={{ background: '#F59E0B20', color: '#B45309' }}
-              >
-                <Star className="w-3 h-3" /> PRO
-              </span>
-            )}
+            <Link
+              href="/saved"
+              className={`p-2 rounded-lg transition-colors ${
+                pathname === '/saved'
+                  ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800'
+              }`}
+              aria-label="Saved careers"
+            >
+              <Bookmark className="w-5 h-5" />
+            </Link>
 
             <Link
               href="/search"
@@ -228,28 +214,13 @@ export default function Navbar() {
               <Search className="w-4 h-4" />
               Search
             </Link>
-            {/* Mobile PRO nudge */}
-            {!isPro && (
-              <button
-                type="button"
-                onClick={() => { setMobileOpen(false); setProModalOpen(true); }}
-                className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm font-bold"
-                style={{ color: '#B45309' }}
-              >
-                <Star className="w-4 h-4" style={{ color: '#F59E0B' }} />
-                Upgrade to TAFUTA PRO
-              </button>
-            )}
+            <Link href="/saved" className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800">
+              <Bookmark className="w-4 h-4" />
+              Saved Careers
+            </Link>
           </div>
         </div>
       )}
-
-      {/* PRO upgrade modal */}
-      <ProUpgradeModal
-        isOpen={proModalOpen}
-        onClose={() => setProModalOpen(false)}
-        triggerFeature="all TAFUTA PRO features"
-      />
     </nav>
   );
 }

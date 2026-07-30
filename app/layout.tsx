@@ -4,7 +4,6 @@ import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ChatBot from '@/components/ChatBot';
-import { ProContextProvider } from '@/context/ProContext';
 
 export const metadata: Metadata = {
   title: 'TAFUTA CAREER | CBC Career Guidance for Kenyan Students',
@@ -37,14 +36,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <ProContextProvider>
-            <Navbar />
-            <main className="min-h-screen pt-16">
-              {children}
-            </main>
-            <Footer />
-            <ChatBot />
-          </ProContextProvider>
+          <Navbar />
+          <main className="min-h-screen pt-16">
+            {children}
+          </main>
+          <Footer />
+          <ChatBot />
         </ThemeProvider>
       </body>
     </html>

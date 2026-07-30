@@ -2,12 +2,10 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, RotateCcw, Share2, Printer, FlaskConical, Palette, Globe, CheckCircle2, Circle, AlertCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, RotateCcw, Share2, Printer, FlaskConical, Palette, Globe, CheckCircle2, Circle, AlertCircle } from 'lucide-react';
 import type { Career, Subject } from '@/lib/career-data';
 import { matchCareers, type MatchResult } from '@/lib/matching';
 import { CareerCard } from '@/components/CareerCard';
-import { useProStatus } from '@/context/ProContext';
-import ProUpgradeModal from '@/components/ProUpgradeModal';
 
 interface CareerMatcherProps {
   allCareers: Career[];
@@ -35,6 +33,9 @@ const SUBJECT_GROUPS: { label: string; subjects: string[] }[] = [
 const MAX_SUBJECTS = 8;
 const MIN_SUBJECTS = 3;
 
+/** How many result cards to render before the "Show more" button, and per click. */
+const RESULTS_PAGE_SIZE = 24;
+
 const SLIDE_VARIANTS = {
   enter: (dir: number) => ({ x: dir > 0 ? 300 : -300, opacity: 0 }),
   center: { x: 0, opacity: 1 },
@@ -48,11 +49,8 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [results, setResults] = useState<MatchResult[]>([]);
   const [copied, setCopied] = useState(false);
-  const [proModalOpen, setProModalOpen] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(RESULTS_PAGE_SIZE);
   const resultsRef = useRef<HTMLDivElement>(null);
-  const { isPro } = useProStatus();
-
-  const FREE_LIMIT = 5;
 
   const allSubjectNames = new Set(allSubjects.map(s => s.name));
 
@@ -74,6 +72,7 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
     else if (step === 2) {
       const matched = matchCareers(selectedSubjects, allCareers, selectedPathway || undefined, 1);
       setResults(matched);
+      setVisibleCount(RESULTS_PAGE_SIZE);
       goTo(3);
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 350);
     }
@@ -83,6 +82,7 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
     setSelectedPathway('');
     setSelectedSubjects([]);
     setResults([]);
+    setVisibleCount(RESULTS_PAGE_SIZE);
     setDirection(-1);
     setStep(1);
   }
@@ -97,8 +97,14 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
     });
   }
 
+  /** Reveal every match first so the printout isn't truncated by pagination. */
   function handlePrint() {
-    window.print();
+    if (visibleCount < results.length) {
+      setVisibleCount(results.length);
+      setTimeout(() => window.print(), 150);
+    } else {
+      window.print();
+    }
   }
 
   const atMax = selectedSubjects.length >= MAX_SUBJECTS;
@@ -336,45 +342,41 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
                 </div>
               ) : (
                 <>
-                  {/* Free users: first 5 results */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {results.slice(0, isPro ? 50 : FREE_LIMIT).map((result, i) => (
+                    {results.slice(0, visibleCount).map((result, i) => (
                       <CareerCard
                         key={result.career.id}
                         career={result.career}
                         showMatch
                         matchPercentage={result.matchPercentage}
                         matchedSubjects={result.matchedSubjects}
-                        index={i}
+                        index={i % RESULTS_PAGE_SIZE}
                       />
                     ))}
                   </div>
 
-                  {/* Locked overlay for remaining results (free users only) */}
-                  {!isPro && results.length > FREE_LIMIT && (
-                    <div className="mt-6 relative rounded-2xl overflow-hidden border-2 border-dashed border-amber-300 dark:border-amber-600">
-                      {/* Blurred ghost cards */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 filter blur-sm pointer-events-none select-none" aria-hidden>
-                        {results.slice(FREE_LIMIT, FREE_LIMIT + 3).map((result) => (
-                          <div key={result.career.id} className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 h-36" />
-                        ))}
-                      </div>
-                      {/* Lock banner */}
-                      <div className="absolute inset-0 flex flex-col items-center justify-center"
-                        style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(4px)' }}>
-                        <p className="font-black text-slate-800 text-lg mb-1">
-                          🔒 {results.length - FREE_LIMIT} more matches
-                        </p>
-                        <p className="text-sm text-slate-500 mb-4 text-center max-w-xs">
-                          Upgrade to TAFUTA PRO to see all {results.length} career matches with advanced sorting
-                        </p>
+                  {/* Progressive reveal — keeps the first paint short on large result sets */}
+                  {visibleCount < results.length && (
+                    <div className="mt-8 flex flex-col items-center gap-3 no-print">
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Showing {visibleCount} of {results.length} matches
+                      </p>
+                      <div className="flex items-center gap-3 flex-wrap justify-center">
                         <button
                           type="button"
-                          onClick={() => setProModalOpen(true)}
+                          onClick={() => setVisibleCount(c => c + RESULTS_PAGE_SIZE)}
                           className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-white hover:opacity-90 transition-opacity"
                           style={{ background: '#006600' }}
                         >
-                          Unlock All Matches — Upgrade to PRO
+                          Show more matches
+                          <ChevronDown className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setVisibleCount(results.length)}
+                          className="px-5 py-2.5 rounded-xl text-sm font-semibold border-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                        >
+                          Show all {results.length}
                         </button>
                       </div>
                     </div>
@@ -385,13 +387,6 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
           )}
         </AnimatePresence>
       </div>
-
-      {/* PRO upgrade modal for matcher results */}
-      <ProUpgradeModal
-        isOpen={proModalOpen}
-        onClose={() => setProModalOpen(false)}
-        triggerFeature="all your Career Matcher results"
-      />
 
       {/* Navigation buttons */}
       <div ref={step !== 3 ? undefined : resultsRef} className="flex items-center justify-between mt-8 no-print">

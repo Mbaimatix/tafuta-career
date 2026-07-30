@@ -14,10 +14,14 @@ Live at **[tafutacareer.com](https://tafutacareer.com)**
 | Styling | Tailwind CSS 4 (configured via `app/globals.css @theme`) |
 | Animations | Framer Motion 12 |
 | Search | Fuse.js 7 (fuzzy search) |
-| Payments | Safaricom Daraja API (M-Pesa STK Push) |
-| Persistence | Vercel KV (Redis) for payment results |
+| Payments | None — every feature is free. Dormant M-Pesa routes remain (see [RESTORING-PAYWALL.md](./RESTORING-PAYWALL.md)) |
+| Persistence | `localStorage` only (saved careers). Vercel KV is used by the dormant payment routes |
 | ORM | Prisma 7 + SQLite (schema reference only — static data at runtime) |
 | Deployment | Vercel |
+
+> **No paywall.** The site has no PRO tier, no subscription, and no login. The
+> university guide, career roadmap, career report PDF/print, full Career Matcher
+> results, and saved-career comparison are all available to everyone.
 
 ---
 
@@ -26,26 +30,33 @@ Live at **[tafutacareer.com](https://tafutacareer.com)**
 ```
 app/
   api/
-    mpesa/
+    mpesa/          DORMANT — no UI calls these. Kept for future monetisation.
       callback/   POST — receives Safaricom STK Push callbacks
       query/      POST — polls payment status (KV → Daraja fallback)
       stkpush/    POST — initiates M-Pesa payment
       token/      GET  — fetches Daraja OAuth token
     pro/
-      activate/   POST — records server-side PRO activation in KV
+      activate/   POST — DORMANT — records an activation in KV
+    random/       GET  — random career
+    search/       GET  — career search (rate limited)
   career/[id]/    1,252 statically pre-rendered career pages
+    CareerExtras.tsx — university guide + roadmap + save button (client)
+    ShareButton.tsx  — share / print / find-similar actions (client)
   matcher/        3-step subject selection wizard
+  saved/          Side-by-side comparison of bookmarked careers
   search/         Fuzzy career search
 components/
   CareerMatcher.tsx     — wizard UI (client)
+  SavedCareers.tsx      — saved list + comparison table (client)
   SearchAutocomplete.tsx — fuzzy search (client)
-context/
-  ProContext.tsx    — PRO subscription state (localStorage + KV)
 lib/
   career-data.ts    — all 1,252 careers as static TypeScript (714 KB)
   matching.ts       — career matching algorithm
+  savedCareers.ts   — localStorage bookmark store (useSyncExternalStore)
+  hydration.ts      — useIsHydrated() for browser-only UI
   rateLimit.ts      — in-memory rate limiter (safe try/catch wrapper)
   search.ts         — Fuse.js helpers
+  universityData.ts — sub-track → Kenyan university programmes + roadmap
 ```
 
 ---
@@ -161,11 +172,22 @@ Go to **Project → Settings → Environment Variables** and add:
 
 ---
 
-## PRO Subscription Tiers
+## Features (all free)
 
-| Plan | Price | Duration |
-|------|-------|----------|
-| Monthly | KES 199 | 30 days |
-| Annual | KES 999 | 365 days |
+| Feature | Where |
+|---------|-------|
+| Browse 1,252 careers across 3 pathways / 9 sub-tracks | `/pathway/[code]`, `/career/[id]` |
+| Career Matcher — full result set, 24 per page via "Show more" | `/matcher` |
+| Fuzzy career search | `/search` |
+| University guide per career (UoN, JKUAT, Strathmore & more) | `/career/[id]` |
+| Visual Career Roadmap — CBC to employment | `/career/[id]` |
+| Career report print / PDF | `/career/[id]`, `/matcher`, `/saved` |
+| Save careers and compare up to 4 side-by-side | `/saved` |
+| AI-powered Career Counselor chatbot | Floating widget, all pages |
 
-Payment is via M-Pesa STK Push. On success the Daraja callback fires `POST /api/mpesa/callback`, which stores the result in Vercel KV. The frontend polls `POST /api/mpesa/query` until confirmed, then calls `POST /api/pro/activate` to persist PRO status server-side and activates it in localStorage via `ProContext`.
+There is no sign-up, no subscription, and no server-side account. Saved careers
+live in the visitor's `localStorage` under `tafuta_saved_careers`.
+
+The M-Pesa routes under `app/api/mpesa/` and `app/api/pro/activate/` are still
+present but **dormant** — nothing in the UI calls them. See
+[RESTORING-PAYWALL.md](./RESTORING-PAYWALL.md) if you ever want to monetise again.
