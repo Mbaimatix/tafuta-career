@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ChevronDown, RotateCcw, Share2, Printer, FlaskConical, Palette, Globe, CheckCircle2, Circle, AlertCircle } from 'lucide-react';
 import type { Career, Subject } from '@/lib/career-data';
 import { matchCareers, type MatchResult } from '@/lib/matching';
 import { CareerCard } from '@/components/CareerCard';
+import MatcherBlueprint from '@/components/MatcherBlueprint';
+import { generateReferenceCode } from '@/lib/referenceCode';
 
 interface CareerMatcherProps {
   allCareers: Career[];
@@ -129,6 +131,13 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
     ? PATHWAY_INFO[selectedPathway as keyof typeof PATHWAY_INFO]?.label ?? null
     : null;
   const dominantGroup = getDominantSubjectGroup(selectedSubjects);
+
+  // Deterministic label for this result set — same pathway + subjects (any
+  // order) always yields the same code, so it stays stable across reruns.
+  const referenceCode = useMemo(
+    () => generateReferenceCode(selectedPathway, selectedSubjects),
+    [selectedPathway, selectedSubjects]
+  );
 
   type Crumb = { label: string; onClick?: () => void };
   const currentStepLabel =
@@ -363,6 +372,16 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
               transition={{ duration: 0.3, ease: 'easeInOut' }}
               ref={resultsRef}
             >
+              {results.length > 0 && pathwayLabel && (
+                <MatcherBlueprint
+                  pathwayCode={selectedPathway}
+                  pathwayLabel={pathwayLabel}
+                  subjects={selectedSubjects}
+                  matchCount={results.length}
+                  referenceCode={referenceCode}
+                />
+              )}
+
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">
                   Your Career Matches
@@ -389,7 +408,7 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
                     onClick={handlePrint}
                     className="flex items-center gap-2 px-4 py-2 bg-slate-600 text-white rounded-lg text-sm font-medium hover:bg-slate-700 transition-colors"
                   >
-                    <Printer className="w-4 h-4" /> Print
+                    <Printer className="w-4 h-4" /> Print / PDF
                   </button>
                 </div>
               </div>
