@@ -19,6 +19,7 @@
 
 import { useSyncExternalStore } from 'react';
 import { generateReferenceCode } from '@/lib/referenceCode';
+import { useIsHydrated } from '@/lib/hydration';
 
 export const MATCHER_HISTORY_KEY = 'tafuta_matcher_history';
 
@@ -188,6 +189,8 @@ export const historyStore: HistoryStore = new LocalHistoryStore();
  */
 export function useMatcherHistory(): { entries: MatcherHistoryEntry[]; hydrated: boolean } {
   const entries = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const hydrated = useSyncExternalStore(subscribe, () => true, () => false);
+  // Reuse the repo's existing hydration primitive rather than opening a second
+  // subscription to this store for a value that never changes.
+  const hydrated = useIsHydrated();
   return { entries, hydrated };
 }

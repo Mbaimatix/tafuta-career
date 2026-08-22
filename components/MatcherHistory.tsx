@@ -12,6 +12,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { History, Trash2, X, Target, ChevronDown, ChevronUp, AlertCircle } from 'lucide-react';
+
 import type { Career } from '@/lib/career-data';
 import { matchCareers } from '@/lib/matching';
 import { CareerCard } from '@/components/CareerCard';
@@ -22,6 +23,13 @@ import { historyStore, useMatcherHistory, MAX_HISTORY_ENTRIES } from '@/lib/matc
 interface MatcherHistoryProps {
   allCareers: Career[];
 }
+
+/**
+ * How many result cards a reopened report renders before "Show more".
+ * Matches RESULTS_PAGE_SIZE in CareerMatcher.tsx — a restored report can be
+ * hundreds of cards, and mounting them all in one commit is expensive.
+ */
+const REPORT_PAGE_SIZE = 24;
 
 function pathwayVariant(code: string): 'green' | 'red' | 'purple' {
   if (code === 'A') return 'green';
@@ -55,8 +63,15 @@ export default function MatcherHistory({ allCareers }: MatcherHistoryProps) {
   const hydrated = useIsHydrated();
   const { entries } = useMatcherHistory();
   const [openEntryId, setOpenEntryId] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(REPORT_PAGE_SIZE);
 
   const openEntry = entries.find(e => e.id === openEntryId) ?? null;
+
+  /** Open a report (or close the current one), always starting from page one. */
+  function toggleEntry(id: string) {
+    setOpenEntryId(current => (current === id ? null : id));
+    setVisibleCount(REPORT_PAGE_SIZE);
+  }
 
   // Recompute the opened run's results from its stored inputs.
   const openResults = useMemo(() => {
@@ -112,7 +127,7 @@ export default function MatcherHistory({ allCareers }: MatcherHistoryProps) {
         </div>
         <button
           type="button"
-          onClick={() => { historyStore.clear(); setOpenEntryId(null); }}
+          onClick={() => { historyStore.clear().catch(() => {}); setOpenEntryId(null); }}
           className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border-2 border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors no-print"
         >
           <Trash2 className="w-4 h-4" />
@@ -153,7 +168,7 @@ export default function MatcherHistory({ allCareers }: MatcherHistoryProps) {
                   <div className="flex items-center gap-2 flex-shrink-0 no-print">
                     <button
                       type="button"
-                      onClick={() => setOpenEntryId(isOpen ? null : entry.id)}
+                      onClick={() => toggleEntry(entry.id)}
                       aria-expanded={isOpen}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold text-white hover:opacity-90 transition-opacity"
                       style={{ background: '#006600' }}
@@ -164,7 +179,7 @@ export default function MatcherHistory({ allCareers }: MatcherHistoryProps) {
                     <button
                       type="button"
                       onClick={() => {
-                        historyStore.remove(entry.id);
+                        historyStore.remove(entry.id).catch(() => {});
                         if (isOpen) setOpenEntryId(null);
                       }}
                       aria-label={`Remove run ${entry.referenceCode} from history`}
@@ -186,17 +201,44 @@ export default function MatcherHistory({ allCareers }: MatcherHistoryProps) {
                     </p>
                   )}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {openResults.map((result, i) => (
+                    {openResults.slice(0, visibleCount).map((result, i) => (
                       <CareerCard
                         key={result.career.id}
                         career={result.career}
                         showMatch
                         matchPercentage={result.matchPercentage}
                         matchedSubjects={result.matchedSubjects}
-                        index={Math.min(i, 12)}
+                        index={i % REPORT_PAGE_SIZE}
                       />
                     ))}
                   </div>
+
+                  {/* Progressive reveal, mirroring the matcher's results screen */}
+                  {visibleCount < openResults.length && (
+                    <div className="mt-6 flex flex-col items-center gap-3 no-print">
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Showing {visibleCount} of {openResults.length} matches
+                      </p>
+                      <div className="flex items-center gap-3 flex-wrap justify-center">
+                        <button
+                          type="button"
+                          onClick={() => setVisibleCount(c => c + REPORT_PAGE_SIZE)}
+                          className="flex items-center gap-2 px-5 py-2 rounded-xl font-bold text-white text-sm hover:opacity-90 transition-opacity"
+                          style={{ background: '#006600' }}
+                        >
+                          Show more matches
+                          <ChevronDown className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setVisibleCount(openResults.length)}
+                          className="px-4 py-2 rounded-xl text-sm font-semibold border-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                        >
+                          Show all {openResults.length}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
