@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { careers, pathways, subTracks } from '@/lib/career-data';
 import { PathwayCard } from '@/components/PathwayCard';
 import { CareerCard } from '@/components/CareerCard';
-import SearchAutocomplete from '@/components/SearchAutocomplete';
+import Hero from '@/components/Hero';
 import { ArrowRight, Sparkles, BookOpen, Target } from 'lucide-react';
 
 // Pick featured careers: mix of high-growth from different pathways
@@ -43,60 +43,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="hero-gradient relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/30" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 text-center">
-          {/* Flag stripe accent */}
-          <div className="flex justify-center mb-8">
-            <div className="flex gap-1 rounded-full overflow-hidden h-2 w-48">
-              <div className="flex-1 bg-black" />
-              <div className="flex-1" style={{ background: '#BB0000' }} />
-              <div className="flex-1 bg-white" />
-              <div className="flex-1" style={{ background: '#006600' }} />
-            </div>
-          </div>
-
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-4 leading-tight animate-fade-in">
-            Discover Your Future <span style={{ color: '#F59E0B' }}>Career Path</span>
-          </h1>
-
-          <p className="text-xl text-white/80 mb-1 italic font-medium">
-            Gundua Njia Yako ya Kazi
-          </p>
-          <p className="text-sm text-white/60 mb-8 italic">
-            (Discover Your Career Path)
-          </p>
-          <p className="text-base text-white/70 mb-8 max-w-2xl mx-auto">
-            The most comprehensive CBC career guidance platform for Kenyan students.
-            Match your subjects to 1,252 careers across all three pathways.
-          </p>
-
-          {/* CTA buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-            <Link
-              href="/matcher"
-              className="flex items-center gap-2 px-8 py-4 rounded-2xl font-bold text-white text-lg shadow-2xl transition-transform hover:scale-105"
-              style={{ background: '#006600' }}
-            >
-              Start Career Matching <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link
-              href="/subjects"
-              className="flex items-center gap-2 px-8 py-4 rounded-2xl font-bold bg-white/20 text-white text-lg border-2 border-white/40 hover:bg-white/30 transition-colors"
-            >
-              Explore by Subject
-            </Link>
-          </div>
-
-          {/* Search bar */}
-          <div className="max-w-2xl mx-auto mb-8">
-            <SearchAutocomplete
-              careers={careers}
-              placeholder="Search 1,252 careers — e.g. Doctor, Software Engineer, Teacher..."
-            />
-          </div>
-        </div>
-      </section>
+      <Hero careers={careers} />
 
       {/* Stats Strip */}
       <section className="bg-slate-900 py-6">
