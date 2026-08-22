@@ -21,6 +21,7 @@ const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/subjects', label: 'Subjects' },
   { href: '/matcher', label: 'Career Matcher' },
+  { href: '/history', label: 'History' },
   { href: '/about', label: 'About' },
 ];
 

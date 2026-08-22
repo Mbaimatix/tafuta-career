@@ -8,6 +8,7 @@ import { matchCareers, type MatchResult } from '@/lib/matching';
 import { CareerCard } from '@/components/CareerCard';
 import MatcherBlueprint from '@/components/MatcherBlueprint';
 import { generateReferenceCode } from '@/lib/referenceCode';
+import { historyStore } from '@/lib/matcherHistory';
 
 interface CareerMatcherProps {
   allCareers: Career[];
@@ -90,6 +91,17 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
       const matched = matchCareers(selectedSubjects, allCareers, selectedPathway || undefined, 1);
       setResults(matched);
       setVisibleCount(RESULTS_PAGE_SIZE);
+      // Log the completed run. Zero-match runs are not recorded, and a logging
+      // failure must never block step 3 — hence the swallowed rejection.
+      if (matched.length > 0) {
+        historyStore
+          .add({
+            pathway: selectedPathway,
+            selectedSubjects,
+            resultCount: matched.length,
+          })
+          .catch(() => {});
+      }
       goTo(3);
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 350);
     }
