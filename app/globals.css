@@ -56,6 +56,7 @@ body {
 @media print {
   nav, footer, .no-print { display: none !important; }
   body { font-size: 12pt; }
+  .blueprint-header { break-inside: avoid; page-break-inside: avoid; }
 }
 
 .growth-high { color: #16a34a; }

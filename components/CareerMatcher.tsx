@@ -1,11 +1,14 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ChevronDown, RotateCcw, Share2, Printer, FlaskConical, Palette, Globe, CheckCircle2, Circle, AlertCircle } from 'lucide-react';
 import type { Career, Subject } from '@/lib/career-data';
 import { matchCareers, type MatchResult } from '@/lib/matching';
 import { CareerCard } from '@/components/CareerCard';
+import MatcherBlueprint from '@/components/MatcherBlueprint';
+import { generateReferenceCode } from '@/lib/referenceCode';
+import { historyStore } from '@/lib/matcherHistory';
 
 interface CareerMatcherProps {
   allCareers: Career[];
@@ -29,6 +32,21 @@ const SUBJECT_GROUPS: { label: string; subjects: string[] }[] = [
   { label: 'Business & Economics', subjects: ['Business Studies'] },
   { label: 'Arts, Sports & Creative', subjects: ['Fine Art', 'Music', 'Music & Dance', 'Physical Education', 'Sport & Recreation', 'Theatre & Film'] },
 ];
+
+/** Returns the SUBJECT_GROUPS label with the most overlap with `selected`, or null if none selected. Ties go to the earliest group in SUBJECT_GROUPS order. */
+function getDominantSubjectGroup(selected: string[]): string | null {
+  if (selected.length === 0) return null;
+  let bestLabel: string | null = null;
+  let bestCount = 0;
+  for (const group of SUBJECT_GROUPS) {
+    const count = group.subjects.filter(s => selected.includes(s)).length;
+    if (count > bestCount) {
+      bestCount = count;
+      bestLabel = group.label;
+    }
+  }
+  return bestLabel;
+}
 
 const MAX_SUBJECTS = 8;
 const MIN_SUBJECTS = 3;
@@ -73,6 +91,17 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
       const matched = matchCareers(selectedSubjects, allCareers, selectedPathway || undefined, 1);
       setResults(matched);
       setVisibleCount(RESULTS_PAGE_SIZE);
+      // Log the completed run. Zero-match runs are not recorded, and a logging
+      // failure must never block step 3 — hence the swallowed rejection.
+      if (matched.length > 0) {
+        historyStore
+          .add({
+            pathway: selectedPathway,
+            selectedSubjects,
+            resultCount: matched.length,
+          })
+          .catch(() => {});
+      }
       goTo(3);
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 350);
     }
@@ -110,6 +139,26 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
   const atMax = selectedSubjects.length >= MAX_SUBJECTS;
   const canProceed = step === 1 ? !!selectedPathway : step === 2 ? selectedSubjects.length >= MIN_SUBJECTS : false;
 
+  const pathwayLabel = selectedPathway
+    ? PATHWAY_INFO[selectedPathway as keyof typeof PATHWAY_INFO]?.label ?? null
+    : null;
+  const dominantGroup = getDominantSubjectGroup(selectedSubjects);
+
+  // Deterministic label for this result set — same pathway + subjects (any
+  // order) always yields the same code, so it stays stable across reruns.
+  const referenceCode = useMemo(
+    () => generateReferenceCode(selectedPathway, selectedSubjects),
+    [selectedPathway, selectedSubjects]
+  );
+
+  type Crumb = { label: string; onClick?: () => void };
+  const currentStepLabel =
+    step === 1 ? 'Choose Pathway' : step === 2 ? (dominantGroup ?? 'Pick Subjects') : 'Your Matches';
+  const crumbs: Crumb[] = [];
+  if (step >= 2 && pathwayLabel) crumbs.push({ label: pathwayLabel, onClick: () => goTo(1) });
+  if (step >= 3) crumbs.push({ label: dominantGroup ?? 'Pick Subjects', onClick: () => goTo(2) });
+  crumbs.push({ label: currentStepLabel }); // current step, never clickable
+
   return (
     <div className="max-w-4xl mx-auto">
       {/* Progress bar */}
@@ -117,13 +166,23 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
         <div className="flex items-center justify-between mb-3">
           {[1, 2, 3].map(s => (
             <div key={s} className="flex items-center gap-2 flex-1">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all ${
-                s < step ? 'bg-green-600 border-green-600 text-white' :
-                s === step ? 'border-green-600 text-green-600 bg-white dark:bg-slate-900' :
-                'border-slate-300 dark:border-slate-600 text-slate-400 bg-white dark:bg-slate-900'
-              }`}>
-                {s < step ? <CheckCircle2 className="w-4 h-4" /> : s}
-              </div>
+              {s < step ? (
+                <button
+                  type="button"
+                  onClick={() => goTo(s)}
+                  aria-label={`Back to step ${s}: ${s === 1 ? 'Choose Pathway' : s === 2 ? 'Pick Subjects' : 'Your Matches'}`}
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all bg-green-600 border-green-600 text-white cursor-pointer hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                </button>
+              ) : (
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all ${
+                  s === step ? 'border-green-600 text-green-600 bg-white dark:bg-slate-900' :
+                  'border-slate-300 dark:border-slate-600 text-slate-400 bg-white dark:bg-slate-900'
+                }`}>
+                  {s}
+                </div>
+              )}
               <div className="hidden sm:block">
                 <p className={`text-xs font-semibold ${s === step ? 'text-slate-900 dark:text-slate-100' : 'text-slate-400'}`}>
                   {s === 1 ? 'Choose Pathway' : s === 2 ? 'Pick Subjects' : 'Your Matches'}
@@ -135,6 +194,29 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
             </div>
           ))}
         </div>
+
+        {crumbs.length > 1 && (
+          <nav aria-label="Wizard breadcrumb" className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 flex-wrap mt-1">
+            {crumbs.map((c, i) => (
+              <span key={i} className="flex items-center gap-1.5">
+                {i > 0 && <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />}
+                {c.onClick ? (
+                  <button
+                    type="button"
+                    onClick={c.onClick}
+                    className="hover:text-slate-700 dark:hover:text-slate-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900 rounded"
+                  >
+                    {c.label}
+                  </button>
+                ) : (
+                  <span className="text-slate-700 dark:text-slate-200 font-medium" aria-current="step">
+                    {c.label}
+                  </span>
+                )}
+              </span>
+            ))}
+          </nav>
+        )}
       </div>
 
       {/* Step content */}
@@ -302,6 +384,16 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
               transition={{ duration: 0.3, ease: 'easeInOut' }}
               ref={resultsRef}
             >
+              {results.length > 0 && pathwayLabel && (
+                <MatcherBlueprint
+                  pathwayCode={selectedPathway}
+                  pathwayLabel={pathwayLabel}
+                  subjects={selectedSubjects}
+                  matchCount={results.length}
+                  referenceCode={referenceCode}
+                />
+              )}
+
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">
                   Your Career Matches
@@ -328,7 +420,7 @@ export default function CareerMatcher({ allCareers, allSubjects }: CareerMatcher
                     onClick={handlePrint}
                     className="flex items-center gap-2 px-4 py-2 bg-slate-600 text-white rounded-lg text-sm font-medium hover:bg-slate-700 transition-colors"
                   >
-                    <Printer className="w-4 h-4" /> Print
+                    <Printer className="w-4 h-4" /> Print / PDF
                   </button>
                 </div>
               </div>
